@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import { SafeAreaView, View, Text, FlatList, ActivityIndicator, StyleSheet, StatusBar } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import AddEmployeeForm from './Screens/AddEmployeeForm';
 import EmployeeItem from './Screens/EmployeeItem';
 import ErrorMessage from './Screens/ErrorMessage';
+
+import { Card } from 'react-native-elements';
 
 export default function App() {
   const [employees, setEmployees] = useState([]);
@@ -45,13 +47,22 @@ export default function App() {
   };
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" />;
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#007AFF" />
+      </View>
+    );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Employee Management</Text>
-      <AddEmployeeForm onAddEmployee={handleAddEmployee} />
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="dark-content" backgroundColor="black" />
+      <View style={styles.header}>
+        <Text style={styles.title}>Employee Management</Text>
+      </View>
+      <Card containerStyle={styles.formCard}>
+        <AddEmployeeForm onAddEmployee={handleAddEmployee} />
+      </Card>
       {error && <ErrorMessage message={error} />}
       <FlatList
         data={employees}
@@ -63,21 +74,42 @@ export default function App() {
           />
         )}
         keyExtractor={item => item.id}
+        contentContainerStyle={styles.listContainer}
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#F0F4F8',
+  },
+  header: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 20,
+    alignItems: 'center',
+    elevation: 4,
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center',
+    color: '#FFFFFF',
+  },
+  formCard: {
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginTop: 16,
+    marginBottom: 8,
+    elevation: 2,
+  },
+  listContainer: {
+    paddingHorizontal: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F0F4F8',
   },
 });

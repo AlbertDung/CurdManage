@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Text } from 'react-native-elements';
 
 export default function ErrorMessage({ message }) {
   return (
@@ -11,12 +12,15 @@ export default function ErrorMessage({ message }) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#ffcccb',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
+    backgroundColor: 'rgba(255, 59, 48, 0.1)',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginHorizontal: 16,
+    marginBottom: 16,
   },
   text: {
-    color: '#d8000c',
+    color: '#FF3B30',
+    fontSize: 14,
   },
 });
