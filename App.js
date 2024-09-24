@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, FlatList, ActivityIndicator, StyleSheet, StatusBar } from 'react-native';
+import { SafeAreaView, View, Text, FlatList, ActivityIndicator, StyleSheet, StatusBar, TouchableOpacity, Modal, TextInput,Dimensions } from 'react-native';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from './firebaseConfig';
 import AddEmployeeForm from './Screens/AddEmployeeForm';
 import EmployeeItem from './Screens/EmployeeItem';
 import ErrorMessage from './Screens/ErrorMessage';
-
-import { Card } from 'react-native-elements';
+import { Icon } from 'react-native-elements';
+const { width, height } = Dimensions.get('window');
 
 export default function App() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [darkMode, setDarkMode] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   useEffect(() => {
     fetchEmployees();
@@ -34,6 +37,7 @@ export default function App() {
 
   const handleAddEmployee = (newEmployee) => {
     setEmployees(prevEmployees => [...prevEmployees, newEmployee]);
+    setModalVisible(false);
   };
 
   const handleUpdateEmployee = (updatedEmployee) => {
@@ -46,26 +50,66 @@ export default function App() {
     setEmployees(prevEmployees => prevEmployees.filter(emp => emp.id !== deletedEmployeeId));
   };
 
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
+
+  const filteredEmployees = employees.filter(employee =>
+    employee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    employee.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (loading) {
     return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#007AFF" />
+      <View style={[styles.loadingContainer, darkMode && styles.darkBackground]}>
+        <ActivityIndicator size="large" color={darkMode ? "#FFFFFF" : "#007AFF"} />
       </View>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" backgroundColor="black" />
-      <View style={styles.header}>
-        <Text style={styles.title}>Employee Management</Text>
+    <SafeAreaView style={[styles.container, darkMode && styles.darkBackground]}>
+      <StatusBar barStyle={darkMode ? "light-content" : "dark-content"} backgroundColor={darkMode ? "#1C1C1E" : "#FFFFFF"} />
+      <View style={[styles.header, darkMode && styles.darkHeader]}>
+        <Text style={[styles.title, darkMode && styles.darkText]}>HR Management</Text>
+        <TouchableOpacity onPress={toggleDarkMode} style={styles.modeToggle}>
+          <Icon name={darkMode ? "sun" : "moon"} type="feather" color={darkMode ? "#FFFFFF" : "#000000"} />
+        </TouchableOpacity>
       </View>
-      <Card containerStyle={styles.formCard}>
-        <AddEmployeeForm onAddEmployee={handleAddEmployee} />
-      </Card>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={[styles.searchInput, darkMode && styles.darkSearchInput]}
+          placeholder="Search employees..."
+          placeholderTextColor={darkMode ? "#999999" : "#666666"}
+          value={searchQuery}
+          onChangeText={setSearchQuery }
+        />
+        <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.addButton}>
+          <Icon name="plus" type="feather" color={darkMode ? "#FFFFFF" : "#000000"} />
+        </TouchableOpacity>
+      </View>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, darkMode && styles.darkModalContent]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, darkMode && styles.darkText]}>Add Employee</Text>
+              <TouchableOpacity onPress={() => setModalVisible(false)}>
+                <Icon name="x" type="feather" color={darkMode ? "#FFFFFF" : "#000000"} />
+              </TouchableOpacity>
+            </View>
+            <AddEmployeeForm onAddEmployee={handleAddEmployee} darkMode={darkMode} />
+          </View>
+        </View>
+      </Modal>
+
       {error && <ErrorMessage message={error} />}
       <FlatList
-        data={employees}
+        data={filteredEmployees}
         renderItem={({ item }) => (
           <EmployeeItem
             employee={item}
@@ -85,23 +129,60 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#F0F4F8',
   },
+  darkBackground: {
+    backgroundColor: '#1C1C1E',
+  },
   header: {
     backgroundColor: '#007AFF',
     paddingVertical: 20,
     alignItems: 'center',
     elevation: 4,
   },
+  darkHeader: {
+    backgroundColor: '#333333',
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
-  formCard: {
+  darkText: {
+    color: '#FFFFFF',
+  },
+  modeToggle: {
+    position: 'absolute',
+    right: 16,
+    top: 16,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+  },
+  searchInput: {
+    flex: 1,
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     borderRadius: 8,
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 8,
-    elevation: 2,
+  },
+  darkSearchInput: {
+    borderColor: '#333333',
+    backgroundColor: '#333333',
+    color: '#FFFFFF',
+  },
+  addButton: {
+    marginLeft: 16,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    padding: 16,
   },
   listContainer: {
     paddingHorizontal: 16,
@@ -111,5 +192,43 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F0F4F8',
+  },
+
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: width * 0.9,
+    maxHeight: height * 0.7,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  darkModalContent: {
+    backgroundColor: '#333333',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  darkText: {
+    color: '#FFFFFF',
   },
 });

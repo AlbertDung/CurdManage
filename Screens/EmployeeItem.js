@@ -11,22 +11,27 @@ export default function EmployeeItem({ employee, onUpdate, onDelete }) {
   const [editedAge, setEditedAge] = useState(employee.age.toString());
 
   const handleUpdate = async () => {
-    if (!editedName.trim() || !editedEmail.trim() || !editedAge.trim()) {
-      alert('All fields are required');
+    if (!isValidInput(editedName) || !isValidInput(editedAge)) {
+      alert('Invalid input. Please use only letters, numbers, and spaces.');
       return;
     }
-
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(editedEmail)) {
+  
+    if (!/^[^\s@]+@[^\s@]+\.[^\ s@]+$/.test(editedEmail)) {
       alert('Please enter a valid email address');
       return;
     }
-
+  
     const age = parseInt(editedAge, 10);
     if (isNaN(age) || age < 18 || age > 100) {
       alert('Please enter a valid age between 18 and 100');
       return;
     }
-
+  
+    if (!(await isEmailUnique(editedEmail.trim())) && editedEmail.trim() !== employee.email) {
+      alert('This email is already in use');
+      return;
+    }
+  
     try {
       const employeeRef = doc(db, 'employees', employee.id);
       await updateDoc(employeeRef, {
@@ -93,6 +98,7 @@ export default function EmployeeItem({ employee, onUpdate, onDelete }) {
     <Card containerStyle={styles.card}>
       <View style={styles.cardContent}>
         <View>
+          <Text style={styles.name}>{employee.ID}</Text>
           <Text style={styles.name}>{employee.name}</Text>
           <Text style={styles.email}>{employee.email}</Text>
           <Text style={styles.age}>Age: {employee.age}</Text>
