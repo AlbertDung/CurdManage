@@ -91,11 +91,12 @@ const LoginScreen = () => {
   };
   const handleGoogleSignIn = async () => {
     try {
-      const result = await onGoogleButtonPress();
-      if (result) {
-        navigation.navigate('Main');
+      const userCredential = await onGoogleButtonPress();
+      if (userCredential) {
+        // Đăng nhập thành công
+        signIn();
       }
-     } catch (error) {
+    } catch (error) {
       setError('Google Sign-In failed. Try again.');
     }
   };
@@ -180,14 +181,7 @@ const LoginScreen = () => {
               <Text style={styles.buttonText}>Log In</Text>
             </TouchableOpacity>
             <View style={styles.socialLoginContainer}>
-              <TouchableOpacity style={styles.socialButton} onPress={() => {
-                  handleGoogleSignIn().then(() => {
-                    signIn(); // Cập nhật trạng thái đăng nhập
-                  }).catch(error => {
-                    console.error(error);
-                    setError('Google Sign-In failed. Try again.');
-                  });
-                }}>
+              <TouchableOpacity style={styles.socialButton} onPress={handleGoogleSignIn}>
                 <FontAwesome name="google" size={24} color="#DB4437" />
               </TouchableOpacity>
               <TouchableOpacity style={styles.socialButton} onPress={handleFacebookLogin}>
