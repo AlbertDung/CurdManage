@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "725105456854",
+    "project_id": "curdmanage",
+    "storage_bucket": "curdmanage.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:725105456854:android:a69779e36f528fce73bb77",
+        "android_client_info": {
+          "package_name": "com.albert.curdmanage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "725105456854-cmomcv2rvi3ns2f8mnep2g1b71d1238k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.albert.curdmanage",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "725105456854-mfh61k5g46clhjhmq8nje2qu3n1bvt75.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCAO2-CW5-YQCSUbauW9q9mcP-qRy_-ak"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "725105456854-mfh61k5g46clhjhmq8nje2qu3n1bvt75.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
